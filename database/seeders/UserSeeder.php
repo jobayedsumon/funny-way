@@ -18,12 +18,28 @@ class UserSeeder extends Seeder {
         $role_admin = Role::create( [ 'name' => 'administrator' ] );
 
         $user = new User();
-        $user->name = '{"en":"Marwa Saad"}';
+        $user->name = 'Marwa Saad';
         $user->email = 'marwa.saad@thewickfirm.com';
         $user->password =  Hash::make('123');
         $user->save ();
 
         $user->assignRole ($role_jc);
+
+        $user = new User();
+        $user->name = 'Jobayed Sumon';
+        $user->email = 'jobayed.sumon@thewickfirm.com';
+        $user->password =  Hash::make('123');
+        $user->save ();
+
+        $user->assignRole ($role_jc);
+
+        $user = new User();
+        $user->name = 'Admin';
+        $user->email = 'admin@thewickfirm.com';
+        $user->password =  Hash::make('123');
+        $user->save ();
+
+        $user->assignRole ($role_admin);
 
     }
 }
