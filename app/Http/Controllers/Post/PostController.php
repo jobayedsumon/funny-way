@@ -19,4 +19,15 @@ class PostController extends Controller
             'most_viewed' => $most_viewed
         ]);
     }
+
+    public function show($slug)
+    {
+        $post = Post::where('slug', $slug)->with('image', 'user.user_meta')->first();
+        $post->total_views += 1;
+        $post->save();
+
+        return response()->json([
+            'post' => $post
+        ]);
+    }
 }
