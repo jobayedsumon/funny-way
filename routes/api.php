@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Post\CommentController;
 use App\Http\Controllers\Post\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,4 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//posts
 Route::resource('posts', PostController::class);
+
+//comments
+Route::get('posts/{slug}/comments', [CommentController::class, 'index']);
+Route::post('posts/{slug}/comment', [CommentController::class, 'store']);
