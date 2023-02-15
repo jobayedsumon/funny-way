@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Post;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\User;
+use App\Models\UserMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,9 +28,9 @@ class CommentController extends Controller
         $total_comments = $parents->count();
 
         if ($request->get('all')) {
-            $comments = $parents->with('replies')->get();
+            $comments = $parents->with('replies')->latest()->get();
         } else {
-            $comments = $parents->with('replies')->limit(2)->get();
+            $comments = $parents->with('replies')->latest()->limit(2)->get();
         }
 
         return response()->json([
@@ -40,10 +42,7 @@ class CommentController extends Controller
     public function store(Request $request, $slug)
     {
         $validator = Validator::make( $request->all(), [
-            'name' => 'required',
-            'picture' => 'required',
             'email' => 'required',
-            'sub' => 'required',
             'content' => 'required'
         ] );
 
@@ -56,6 +55,21 @@ class CommentController extends Controller
 
         $post = Post::where('slug', $slug)->first();
 
+        $user = User::where('email', $request->get('email'))->first();
+
+        if (!$user) {
+
+            $user = new User();
+            $user->name = $request->get('name');
+            $user->email = $request->get('email');
+            $user->save();
+
+            $user_meta = new UserMeta();
+            $user_meta->image = $request->get('picture');
+
+            $user->user_meta()->save($user_meta);
+        }
+
         if (!$post) {
             return response()->json([
                 'status' => 'error',
@@ -66,13 +80,11 @@ class CommentController extends Controller
         $comment = new Comment();
 
         $comment->post_id = $post->id;
+        $comment->user_id = $user->id;
+
         if ($request->get('parent_id')) {
             $comment->parent_id = $request->get('parent_id');
         }
-        $comment->name = $request->get('name');
-        $comment->picture = $request->get('picture');
-        $comment->email = $request->get('email');
-        $comment->sub = $request->get('sub');
         $comment->content = $request->get('content');
 
         $comment->save();

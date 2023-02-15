@@ -25,7 +25,7 @@ class PostController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->with('image', 'user.user_meta')->first();
+        $post = Post::where('slug', $slug)->with('image', 'user.user_meta')->withCount('comments')->first();
         $post->total_views += 1;
         $post->save();
 

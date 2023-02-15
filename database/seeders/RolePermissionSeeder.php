@@ -22,6 +22,7 @@ class RolePermissionSeeder extends Seeder
             [ 'name' => 'manage-permissions' ] ,
             [ 'name' => 'view-roles' ] ,
             [ 'name' => 'manage-roles' ] ,
+            [ 'name' => 'manage-posts' ] ,
 
         ];
         foreach ( $permissions as $permission ) {
