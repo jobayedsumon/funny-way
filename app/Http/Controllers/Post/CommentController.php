@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 class CommentController extends Controller
 {
 
-    public function index($slug)
+    public function index(Request $request, $slug)
     {
         $post = Post::where('slug', $slug)->first();
 
@@ -22,16 +22,21 @@ class CommentController extends Controller
             ]);
         }
 
-        $comments = $post->comments()->whereNull('parent_id')->with('replies')->get();
+        $parents = $post->comments()->whereNull('parent_id');
+        $total_comments = $parents->count();
 
-
+        if ($request->get('all')) {
+            $comments = $parents->with('replies')->get();
+        } else {
+            $comments = $parents->with('replies')->limit(2)->get();
+        }
 
         return response()->json([
             'status' => 'success',
-            'comments' => $comments
+            'comments' => $comments,
+            'total_comments' => $total_comments
         ]);
     }
-
     public function store(Request $request, $slug)
     {
         $validator = Validator::make( $request->all(), [

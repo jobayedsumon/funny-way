@@ -20,5 +20,5 @@ use Illuminate\Support\Facades\Route;
 Route::resource('posts', PostController::class);
 
 //comments
-Route::get('posts/{slug}/comments', [CommentController::class, 'index']);
+Route::post('posts/{slug}/comments', [CommentController::class, 'index']);
 Route::post('posts/{slug}/comment', [CommentController::class, 'store']);
