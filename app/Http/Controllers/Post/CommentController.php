@@ -42,7 +42,7 @@ class CommentController extends Controller
     public function store(Request $request, $slug)
     {
         $validator = Validator::make( $request->all(), [
-            'email' => 'required',
+            'sub' => 'required',
             'content' => 'required'
         ] );
 
@@ -55,11 +55,12 @@ class CommentController extends Controller
 
         $post = Post::where('slug', $slug)->first();
 
-        $user = User::where('email', $request->get('email'))->first();
+        $user = User::where('unique_id', $request->get('sub'))->first();
 
         if (!$user) {
 
             $user = new User();
+            $user->unique_id = $request->get('sub');
             $user->name = $request->get('name');
             $user->email = $request->get('email');
             $user->save();
@@ -81,10 +82,7 @@ class CommentController extends Controller
 
         $comment->post_id = $post->id;
         $comment->user_id = $user->id;
-
-        if ($request->get('parent_id')) {
-            $comment->parent_id = $request->get('parent_id');
-        }
+        $comment->parent_id = $request->get('parent_id');
         $comment->content = $request->get('content');
 
         $comment->save();
