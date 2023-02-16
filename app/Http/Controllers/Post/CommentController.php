@@ -28,9 +28,9 @@ class CommentController extends Controller
         $total_comments = $parents->count();
 
         if ($request->get('all')) {
-            $comments = $parents->with('replies')->latest()->get();
+            $comments = $parents->with('replies', 'likes.user')->latest()->get();
         } else {
-            $comments = $parents->with('replies')->latest()->limit(2)->get();
+            $comments = $parents->with('replies', 'likes.user')->latest()->limit(2)->get();
         }
 
         return response()->json([
@@ -90,6 +90,38 @@ class CommentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Comment added successfully'
+        ]);
+    }
+
+    public function like(Request $request, $id)
+    {
+        $validator = Validator::make( $request->all(), [
+            'sub' => 'required',
+        ] );
+
+        if ( $validator->fails() ) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->first(),
+            ]);
+        }
+
+        $comment = Comment::where('id', $id)->first();
+        $user = User::where('unique_id', $request->get('sub'))->first();
+
+        $like = $comment->likes()->where('user_id', $user->id)->first();
+
+        if ($like) {
+            $like->delete();
+        } else {
+            $comment->likes()->create([
+                'user_id' => $user->id,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successful'
         ]);
     }
 }

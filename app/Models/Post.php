@@ -23,4 +23,9 @@ class Post extends Model
     {
         return $this->hasMany( Comment::class )->with('user.user_meta');
     }
+
+    public function reacts()
+    {
+        return $this->hasMany( React::class );
+    }
 }

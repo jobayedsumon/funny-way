@@ -22,3 +22,9 @@ Route::resource('posts', PostController::class);
 //comments
 Route::post('posts/{slug}/comments', [CommentController::class, 'index']);
 Route::post('posts/{slug}/comment', [CommentController::class, 'store']);
+
+//React
+Route::post('/posts/{slug}/react', [PostController::class, 'react']);
+
+//Like
+Route::post('/comments/{id}/like', [CommentController::class, 'like']);

@@ -21,6 +21,11 @@ class Comment extends Model
 
     public function replies()
     {
-        return $this->children()->with(__FUNCTION__, 'user.user_meta');
+        return $this->children()->with(__FUNCTION__, 'user.user_meta', 'likes.user');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany( Like::class );
     }
 }
