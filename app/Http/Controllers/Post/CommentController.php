@@ -55,7 +55,7 @@ class CommentController extends Controller
 
         $post = Post::where('slug', $slug)->first();
 
-        $user = User::where('unique_id', $request->get('sub'))->first();
+        $user = User::where('unique_id', $request->get('sub'))->orWhere('email', $request->get('email'))->first();
 
         if (!$user) {
 
@@ -107,7 +107,7 @@ class CommentController extends Controller
         }
 
         $comment = Comment::where('id', $id)->first();
-        $user = User::where('unique_id', $request->get('sub'))->first();
+        $user = User::where('unique_id', $request->get('sub'))->orWhere('email', $request->get('email'))->first();
 
         $like = $comment->likes()->where('user_id', $user->id)->first();
 

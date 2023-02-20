@@ -13,20 +13,22 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('image')->orderBy('created_at', 'desc')->get();
-        $most_viewed = Post::withCount('comments')->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-            ->orderBy('total_views', 'desc')->get();
+        $posts = Post::select('id', 'title', 'slug', 'content', 'created_at')
+            ->with('image:path,post_id')->orderBy('created_at', 'desc')->get();
+
+//        $most_viewed = Post::withCount('comments')->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+//            ->orderBy('total_views', 'desc')->get();
 
         return response()->json([
             'status' => 'success',
             'posts' => $posts,
-            'most_viewed' => $most_viewed
+//            'most_viewed' => $most_viewed
         ]);
     }
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->with('image', 'user.user_meta')->withCount('comments', 'reacts')->first();
+        $post = Post::where('slug', $slug)->with('image:path,post_id')->withCount('comments', 'reacts')->first();
         $post->total_views += 1;
         $post->save();
 
@@ -50,7 +52,7 @@ class PostController extends Controller
         }
 
         $post = Post::where('slug', $slug)->first();
-        $user = User::where('unique_id', $request->get('sub'))->first();
+        $user = User::where('unique_id', $request->get('sub'))->orWhere('email', $request->get('email'))->first();
 
         $react = $post->reacts()->where('user_id', $user->id)->first();
 
@@ -62,7 +64,7 @@ class PostController extends Controller
             ]);
         }
 
-        $post = Post::where('slug', $slug)->with('image', 'user.user_meta')->withCount('comments', 'reacts')->first();
+        $post = Post::where('slug', $slug)->with('image:path,post_id')->withCount('comments', 'reacts')->first();
 
         return response()->json([
             'status' => 'success',

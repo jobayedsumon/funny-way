@@ -12,10 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasRoles, HasFactory, Notifiable;
 
-    public $translatable = [ 'name' ];
-
-    protected $appends = [ 'initials', 'first_name' ];
-
     protected $table = 'users';
 
     protected $guard_name = 'web';
@@ -54,22 +50,4 @@ class User extends Authenticatable
         return $this->hasOne( UserMeta::class );
     }
 
-
-    public function getFirstNameAttribute() {
-        $name       = $this->name;
-        $name_array = explode( " ", $name );
-
-        return $name_array[0];
-    }
-
-    public function getInitialsAttribute() {
-        $name       = $this->name;
-        $name_array = explode( " ", $name );
-        $initials   = '';
-        foreach ( $name_array as $name_word ) {
-            $initials .= substr( $name_word, 0, 1 );
-        }
-
-        return $initials;
-    }
 }
