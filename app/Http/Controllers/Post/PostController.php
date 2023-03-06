@@ -71,4 +71,17 @@ class PostController extends Controller
             'post' => $post
         ]);
     }
+
+    public function search($query = "")
+    {
+        $query = strtolower($query);
+
+        $posts = Post::select('id', 'title', 'slug', 'content', 'created_at')
+            ->with('image:path,post_id')->whereRaw("LOWER(title) LIKE '%$query%'")->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'posts' => $posts
+        ]);
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Post\CommentController;
 use App\Http\Controllers\Post\PostController;
 use Illuminate\Http\Request;
@@ -15,6 +16,12 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+//categories
+Route::resource('categories', CategoryController::class);
+
+//search
+Route::get('/search/{query?}', [PostController::class, 'search']);
 
 //posts
 Route::resource('posts', PostController::class);
