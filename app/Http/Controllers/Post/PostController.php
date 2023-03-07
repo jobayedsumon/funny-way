@@ -77,7 +77,8 @@ class PostController extends Controller
         $query = strtolower($query);
 
         $posts = Post::select('id', 'title', 'slug', 'content', 'created_at')
-            ->with('image:path,post_id')->whereRaw("LOWER(title) LIKE '%$query%'")->orderBy('created_at', 'desc')->get();
+            ->with('image:path,post_id')->whereRaw("LOWER(title) LIKE '%$query%'")
+            ->orWhereRaw("LOWER(content) LIKE '%$query%'")->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'status' => 'success',
