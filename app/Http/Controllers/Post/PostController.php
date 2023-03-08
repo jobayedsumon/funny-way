@@ -28,13 +28,20 @@ class PostController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->with('image:path,post_id')->withCount('comments', 'reacts')->first();
+        $post = Post::where('slug', $slug)->with('image:path,post_id')
+                ->withCount('comments', 'reacts')->with('category:slug,id')->first();
         $post->total_views += 1;
         $post->save();
 
+        $related_posts = Post::where('id', '!=', $post->id)
+                        ->where('category_id', $post->category_id)
+                        ->select('id', 'title', 'slug', 'content', 'created_at')
+                        ->with('image:path,post_id')->orderBy('created_at', 'desc')->limit(8)->get();
+
         return response()->json([
             'status' => 'success',
-            'post' => $post
+            'post' => $post,
+            'related_posts' => $related_posts
         ]);
     }
 

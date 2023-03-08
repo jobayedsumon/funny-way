@@ -28,4 +28,9 @@ class Post extends Model
     {
         return $this->hasMany( React::class );
     }
+
+    public function category()
+    {
+        return $this->belongsTo( Category::class );
+    }
 }
