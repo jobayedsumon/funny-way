@@ -14,7 +14,12 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::select('id', 'title', 'slug', 'content', 'created_at')
-            ->with('image:path,post_id')->orderBy('created_at', 'desc')->get();
+                ->whereHas('category', function ($query) {
+                    $query->where('category_type', 1);
+                })
+                ->with('image:path,post_id')
+                ->orderBy('created_at', 'desc')
+                ->get();
 
 //        $most_viewed = Post::withCount('comments')->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
 //            ->orderBy('total_views', 'desc')->get();
@@ -29,14 +34,20 @@ class PostController extends Controller
     public function show($slug)
     {
         $post = Post::where('slug', $slug)->with('image:path,post_id')
-                ->withCount('comments', 'reacts')->with('category:slug,id')->first();
+                ->withCount('comments', 'reacts')->with('category:slug,category_type,id')->first();
         $post->total_views += 1;
         $post->save();
 
-        $related_posts = Post::where('id', '!=', $post->id)
-                        ->where('category_id', $post->category_id)
-                        ->select('id', 'title', 'slug', 'content', 'created_at')
-                        ->with('image:path,post_id')->orderBy('created_at', 'desc')->limit(8)->get();
+        if ($post->category->category_type == 1) {
+            $related_posts = Post::where('id', '!=', $post->id)
+                ->where('category_id', $post->category_id)
+                ->select('id', 'title', 'slug', 'content', 'created_at')
+                ->with('image:path,post_id')->orderBy('created_at', 'desc')->limit(8)->get();
+        } else {
+            $related_posts = [];
+        }
+
+
 
         return response()->json([
             'status' => 'success',
@@ -84,8 +95,13 @@ class PostController extends Controller
         $query = strtolower($query);
 
         $posts = Post::select('id', 'title', 'slug', 'content', 'created_at')
-            ->with('image:path,post_id')->whereRaw("LOWER(title) LIKE '%$query%'")
-            ->orWhereRaw("LOWER(content) LIKE '%$query%'")->orderBy('created_at', 'desc')->get();
+                ->whereHas('category', function ($query) {
+                    $query->where('category_type', 1);
+                })
+                ->whereRaw("(LOWER(title) LIKE '%$query%' OR LOWER(content) LIKE '%$query%')")
+                ->with('image:path,post_id')
+                ->orderBy('created_at', 'desc')
+                ->get();
 
         return response()->json([
             'status' => 'success',
