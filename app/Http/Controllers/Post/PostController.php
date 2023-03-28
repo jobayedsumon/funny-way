@@ -18,7 +18,7 @@ class PostController extends Controller
                     $query->where('category_type', 1);
                 })
                 ->with('image:path,post_id')
-                ->orderBy('created_at', 'desc')
+                ->orderBy('datetime', 'desc')
                 ->get();
 
 //        $most_viewed = Post::withCount('comments')->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
@@ -42,7 +42,7 @@ class PostController extends Controller
             $related_posts = Post::where('id', '!=', $post->id)
                 ->where('category_id', $post->category_id)
                 ->select('id', 'title', 'slug', 'content', 'created_at')
-                ->with('image:path,post_id')->orderBy('created_at', 'desc')->limit(8)->get();
+                ->with('image:path,post_id')->orderBy('datetime', 'desc')->limit(8)->get();
         } else {
             $related_posts = [];
         }
@@ -100,7 +100,7 @@ class PostController extends Controller
                 })
                 ->whereRaw("(LOWER(title) LIKE '%$query%' OR LOWER(content) LIKE '%$query%')")
                 ->with('image:path,post_id')
-                ->orderBy('created_at', 'desc')
+                ->orderBy('datetime', 'desc')
                 ->get();
 
         return response()->json([

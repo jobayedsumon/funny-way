@@ -22,7 +22,7 @@ class CategoryController extends Controller
         $category = Category::where('slug', $slug)->first();
 
         $posts = $category->posts()->select('id', 'title', 'slug', 'content', 'created_at')
-            ->with('image:path,post_id')->orderBy('created_at', 'desc')->get();
+            ->with('image:path,post_id')->orderBy('datetime', 'desc')->get();
 
         return response()->json([
             'status' => 'success',
